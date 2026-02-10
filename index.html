@@ -110,12 +110,15 @@
             padding: 12px;
             box-shadow: var(--shadow-soft);
             transform: rotateY(0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .photo-front img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;  /* ← Changed from 'cover' to 'contain' */
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             display: block;
             border-radius: 2px;
         }
@@ -132,22 +135,10 @@
         }
         
         .photo-back img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;  /* ← Changed from 'cover' to 'contain' */
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             border-radius: 2px;
-        }
-        
-        /* Polaroid-style caption area (optional) */
-        .photo-front::after {
-            content: '';
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
-            height: 40px;
-            background: white;
-            border-radius: 0 0 2px 2px;
         }
         
         /* Tape effect using pseudo-elements */
@@ -303,59 +294,64 @@
     <!-- Background Music -->
     <!-- 
         TO CHANGE MUSIC:
-        Replace the src URL below with your music file
-        Supported formats: MP3, OGG, WAV
-        For best compatibility, use MP3
+        Replace the src with your music file name
+        Make sure the file is in the same folder as this HTML file
     -->
     <audio id="bgMusic" loop>
-         <source src="Fingerbib.mp3" type="audio/mpeg">
+        <source src="Fingerbib.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
     </audio>
     
     <script>
         /* ============================================
            IMAGE CONFIGURATION
            TO CHANGE IMAGES: Edit the arrays below
+           Replace with your own image filenames
            ============================================ */
         
         // GALLERY IMAGES (front of cards)
-        // Replace these URLs with your own images
+        // Make sure these files are in the same folder as this HTML file
         const galleryImages = [
-        'pic1.jpg',
-        'pic2.jpg',
-        'pic3.JPG',
-        'pic4.JPG',
-        'pic5.jpg',
-        'pic6.JPG',
-        'pic7.JPG',
-        'pic8.JPG'
-            ];
+            'pic1.jpg',
+            'pic2.jpg',
+            'pic3.jpg',
+            'pic4.jpg',
+            'pic5.jpg',
+            'pic6.jpg',
+            'pic7.jpg',
+            'pic8.jpg'
+        ];
         
         // SEAL IMAGES (back of cards)
-        // Replace these URLs with your seal photos
-       const sealImages = [
-        'seal1.jpg',
-        'seal2.jpg',
-        'seal3.jpg',
-        'seal4.jpg',
-        'seal5.jpg',
-        'seal6.jpg',
-        'seal7.jpg',
-        'seal8.jpg'
-            ];
+        // Make sure these files are in the same folder as this HTML file
+        const sealImages = [
+            'seal1.jpg',
+            'seal2.jpg',
+            'seal3.jpg',
+            'seal4.jpg',
+            'seal5.jpg',
+            'seal6.jpg',
+            'seal7.jpg',
+            'seal8.jpg'
+        ];
         
         /* ============================================
            SCRAPBOOK LAYOUT CONFIGURATION
-           Adjust these to change randomness
            ============================================ */
         
-        // Size variations (in pixels)
-        // Use natural image dimensions
-        const imageSizes = null;  // Set to null to use natural sizes
-            ];
+        // Maximum dimensions for photos (they will scale down if larger)
+        const maxPhotoWidth = 280;
+        const maxPhotoHeight = 280;
         
-        // Rotation range (in degrees)
+        // Rotation range (in degrees) - set to 0 for no rotation
         const minRotation = -8;
         const maxRotation = 8;
+        
+        // Center clustering configuration
+        // These control how tightly photos cluster in the center
+        const centerX = 200; // Center point X (adjust based on your screen)
+        const centerY = 400; // Center point Y (adjust based on your screen)
+        const spreadRadius = 150; // How far from center photos can appear
         
         /* ============================================
            DOM ELEMENTS
@@ -429,144 +425,24 @@
         
         /* ============================================
            GALLERY GENERATION
-           Creates photo cards with asymmetric layout
+           Creates photo cards with centered clustering
+           Photos display at their natural size (limited by max dimensions)
            ============================================ */
         function createGallery() {
             const galleryWidth = Math.min(window.innerWidth - 40, 800);
             const galleryHeight = window.innerHeight * 0.8;
+            
+            // Track positions to minimize overlapping
+            const usedPositions = [];
             
             galleryImages.forEach((imgSrc, index) => {
                 // Create card container
                 const card = document.createElement('div');
                 card.className = 'photo-card';
                 
-                // Random size from preset options
-                const size = { width: 200, height: 200 };
+                // Temporary size - will be updated when image loads
+                card.style.width = '250px';
+                card.style.height = '250px';
                 
-            
-               // Manual positions for each photo (x = left-to-right, y = top-to-bottom)
-                const positions = [
-                    { x: 50, y: 20 },     // Photo 1: top-left area
-                    { x: 280, y: 100 },   // Photo 2: top-right area  
-                    { x: 120, y: 220 },   // Photo 3: middle-left
-                    { x: 350, y: 280 },   // Photo 4: middle-right
-                    { x: 80, y: 420 },    // Photo 5: lower-left
-                    { x: 300, y: 480 },   // Photo 6: lower-right
-                    { x: 180, y: 620 },   // Photo 7: bottom-left
-                    { x: 360, y: 680 }    // Photo 8: bottom-right
-                ];
-
-                    const x = positions[index].x;
-                    const y = positions[index].y;
-                
-                // Random rotation
-                const rotation = minRotation + Math.random() * (maxRotation - minRotation);
-                
-                // Apply styles
-                card.style.width = size.width + 'px';
-                card.style.height = size.height + 'px';
-                card.style.left = x + 'px';
-                card.style.top = y + 'px';
-                card.style.transform = `rotate(${rotation}deg)`;
-                
-                // Create inner flip container
-                const inner = document.createElement('div');
-                inner.className = 'photo-inner';
-                
-              // Front face (gallery image)
-                const front = document.createElement('div');
-                front.className = 'photo-front';
-                const frontImg = document.createElement('img');
-                frontImg.src = imgSrc;
-                frontImg.alt = `Gallery photo ${index + 1}`;
-                frontImg.loading = 'lazy';
-                
-                // Set card size to match natural image dimensions
-                frontImg.onload = function() {
-                    const maxWidth = 300;  // Maximum width for any photo
-                    const aspectRatio = this.naturalHeight / this.naturalWidth;
-                    
-                    let width = this.naturalWidth;
-                    let height = this.naturalHeight;
-                    
-                    // Scale down if too large
-                    if (width > maxWidth) {
-                        width = maxWidth;
-                        height = width * aspectRatio;
-                    }
-                    
-                    // Update card dimensions
-                    card.style.width = width + 'px';
-                    card.style.height = height + 'px';
-                };
-                
-                front.appendChild(frontImg);
-                
-                // Back face (seal image)
-                const back = document.createElement('div');
-                back.className = 'photo-back';
-                const backImg = document.createElement('img');
-                backImg.src = sealImages[index % sealImages.length];
-                backImg.alt = `Seal photo ${index + 1}`;
-                backImg.loading = 'lazy';
-                back.appendChild(backImg);
-                
-                // Assemble card
-                inner.appendChild(front);
-                inner.appendChild(back);
-                card.appendChild(inner);
-                gallery.appendChild(card);
-            });
-            
-            // Show gallery after creation
-            gallery.classList.remove('loading');
-            gallery.classList.add('loaded');
-        }
-        
-        /* ============================================
-           FLIP FUNCTIONALITY
-           Toggles all cards with staggered animation
-           ============================================ */
-        let isFlipped = false;
-        
-        flipButton.addEventListener('click', () => {
-            playOnInteraction(); // Attempt to play music on first tap
-            
-            const cards = document.querySelectorAll('.photo-card');
-            
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    if (isFlipped) {
-                        card.classList.remove('flipped');
-                    } else {
-                        card.classList.add('flipped');
-                    }
-                }, index * 100); // Stagger by 100ms per card
-            });
-            
-            isFlipped = !isFlipped;
-            
-            // Animate button
-            flipButton.style.transform = 'translateY(-50%) rotate(360deg)';
-            setTimeout(() => {
-                flipButton.style.transform = 'translateY(-50%) rotate(0deg)';
-            }, 600);
-        });
-        
-        /* ============================================
-           ENABLE MUSIC ON ANY TAP (mobile fallback)
-           ============================================ */
-        document.body.addEventListener('click', playOnInteraction, { once: false });
-        document.body.addEventListener('touchstart', playOnInteraction, { once: false });
-        
-        /* ============================================
-           INITIALIZATION
-           ============================================ */
-        window.addEventListener('load', () => {
-            createGallery();
-            attemptAutoplay();
-        });
-        
-    </script>
-</body>
-</html>
+                // Position in center with limited overlap
+                l
