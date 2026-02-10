@@ -299,7 +299,6 @@
     -->
     <audio id="bgMusic" loop>
         <source src="Fingerbib.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
     
     <script>
@@ -349,9 +348,16 @@
         
         // Center clustering configuration
         // These control how tightly photos cluster in the center
-        const centerX = 200; // Center point X (adjust based on your screen)
-        const centerY = 400; // Center point Y (adjust based on your screen)
-        const spreadRadius = 150; // How far from center photos can appear
+        const positions = [
+            { x: 50, y: 50 },     // Left column, row 1
+            { x: 350, y: 50 },    // Right column, row 1
+            { x: 50, y: 250 },    // Left column, row 2
+            { x: 350, y: 250 },   // Right column, row 2
+            { x: 50, y: 450 },    // Left column, row 3
+            { x: 350, y: 450 },   // Right column, row 3
+            { x: 50, y: 650 },    // Left column, row 4
+            { x: 350, y: 650 }    // Right column, row 4
+        ];
         
         /* ============================================
            DOM ELEMENTS
