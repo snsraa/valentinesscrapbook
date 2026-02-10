@@ -196,15 +196,15 @@
 
         /* Different heart images - TO USE YOUR OWN: Upload heart1.png, heart2.png, heart3.png */
         .heart.heart1 {
-            background-image: url('heart1.png');
+            background-image: url('Heart.png');
         }
 
         .heart.heart2 {
-            background-image: url('heart2.png');
+            background-image: url('Star1.png');
         }
 
         .heart.heart3 {
-            background-image: url('heart3.png');
+            background-image: url('Star2.png');
         }
 
         /* Floating animation */
@@ -245,9 +245,9 @@
         
         /* ============================================
            FLIP BUTTON - WITH CUSTOM IMAGE SUPPORT
-           TO USE YOUR OWN: Upload flip-button.png
+           TO USE YOUR OWN: Upload Seals.png
            ============================================ */
-        .flip-button {
+        .Seals {
             position: fixed;
             right: 20px;
             top: 50%;
@@ -262,8 +262,8 @@
             height: 70px;
             cursor: pointer;
             
-            /* Custom button image - Upload flip-button.png to use */
-            background-image: url('flip-button.png');
+            /* Custom button image - Upload Seals.png to use */
+            background-image: url('Seals.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -280,17 +280,17 @@
             transition: all 0.3s ease;
         }
         
-        .flip-button:hover {
+        .Seals:hover {
             transform: translateY(-50%) scale(1.1);
         }
         
-        .flip-button:active {
+        .Seals:active {
             transform: translateY(-50%) scale(0.95);
         }
         
         /* ============================================
            MUSIC CONTROLS - WITH CUSTOM IMAGE SUPPORT
-           TO USE YOUR OWN: Upload music-button.png and music-button-muted.png
+           TO USE YOUR OWN: Upload MusicOn.png and MusicOff.png
            ============================================ */
         .music-control {
             position: fixed;
@@ -306,8 +306,8 @@
             height: 60px;
             cursor: pointer;
             
-            /* Custom music button image - Upload music-button.png to use */
-            background-image: url('music-button.png');
+            /* Custom music button image - Upload MusicOn.png to use */
+            background-image: url('MusicOn.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -328,9 +328,9 @@
             transform: scale(1.05);
         }
         
-        /* When music is muted - Upload music-button-muted.png for custom muted icon */
+        /* When music is muted - Upload MusicOff.png for custom muted icon */
         .music-control.muted {
-            background-image: url('music-button-muted.png');
+            background-image: url('MusicOff.png');
             opacity: 0.7;
         }
         
@@ -342,7 +342,7 @@
                 margin: 40px auto 60px;
             }
             
-            .flip-button {
+            .Seals {
                 width: 60px;
                 height: 60px;
                 font-size: 20px;
@@ -380,7 +380,7 @@
     <div class="gallery loading" id="gallery"></div>
     
     <!-- Flip Button -->
-    <button class="flip-button" id="flipButton" aria-label="Flip photos">
+    <button class="Seals" id="flipButton" aria-label="Flip photos">
         🔄
     </button>
     
@@ -391,7 +391,7 @@
     
     <!-- Background Music -->
     <audio id="bgMusic" loop>
-        <source src="Fingerbib.mp3" type="audio/mpeg">
+        <source src="Fingerbib.m4a" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
     
