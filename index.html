@@ -81,7 +81,7 @@
             /* Individual cards are positioned via inline styles in JS */
         }
         
-        .photo-inner {
+       .photo-inner {
             position: relative;
             width: 100%;
             height: 100%;
@@ -89,10 +89,6 @@
             transform-style: preserve-3d;
         }
         
-        /* When flipped class is added */
-        .photo-card.flipped .photo-inner {
-            transform: rotateY(180deg);
-        }
         
         /* Front and back faces */
         .photo-front,
@@ -445,13 +441,13 @@
                 // y = distance from top edge
                 // ============================================
                 const positions = [
-                    { x: 25, y: 100 },     // Photo 1: Left column, row 1
+                    { x: 10, y: 100 },     // Photo 1: Left column, row 1
                     { x: 400, y: 200 },    // Photo 2: Right column, row 1
-                    { x: 40, y: 300 },    // Photo 3: Left column, row 2
-                    { x: 350, y: 400 },   // Photo 4: Right column, row 2
-                    { x: 50, y: 500 },    // Photo 5: Left column, row 3
-                    { x: 350, y: 600 },   // Photo 6: Right column, row 3
-                    { x: 250, y: 700 },    // Photo 7: Left column, row 4
+                    { x: 40, y: 400 },    // Photo 3: Left column, row 2
+                    { x: 350, y: 450 },   // Photo 4: Right column, row 2
+                    { x: 15, y: 600 },    // Photo 5: Left column, row 3
+                    { x: 500, y: 700 },   // Photo 6: Right column, row 3
+                    { x: 20, y: 700 },    // Photo 7: Left column, row 4
                     { x: 430, y: 800 }    // Photo 8: Right column, row 4
                 ];
                 
@@ -464,11 +460,17 @@
                 // Apply position styles
                 card.style.left = x + 'px';
                 card.style.top = y + 'px';
-                card.style.transform = `rotate(${rotation}deg)`;
                 
                 // Create inner flip container
                 const inner = document.createElement('div');
                 inner.className = 'photo-inner';
+                
+                // Apply rotation to the INNER container (not the card)
+                // This prevents conflict with the flip animation
+                inner.style.transform = `rotate(${rotation}deg)`;
+                
+                // Store rotation value for flip animation to use
+                inner.dataset.rotation = rotation;
                 
                 // Front face (gallery image)
                 const front = document.createElement('div');
@@ -538,9 +540,16 @@
             
             cards.forEach((card, index) => {
                 setTimeout(() => {
+                    const inner = card.querySelector('.photo-inner');
+                    const rotation = inner.dataset.rotation || 0;
+                    
                     if (isFlipped) {
+                        // Flip back to front - just rotation
+                        inner.style.transform = `rotate(${rotation}deg)`;
                         card.classList.remove('flipped');
                     } else {
+                        // Flip to back - combine rotation with flip
+                        inner.style.transform = `rotate(${rotation}deg) rotateY(180deg)`;
                         card.classList.add('flipped');
                     }
                 }, index * 100); // Stagger by 100ms per card
