@@ -115,7 +115,7 @@
         .photo-front img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;  /* ← Changed from 'cover' to 'contain' */
             display: block;
             border-radius: 2px;
         }
@@ -134,7 +134,7 @@
         .photo-back img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;  /* ← Changed from 'cover' to 'contain' */
             border-radius: 2px;
         }
         
@@ -349,13 +349,9 @@
            ============================================ */
         
         // Size variations (in pixels)
-        const imageSizes = [
-            { width: 200, height: 180 },
-            { width: 180, height: 200 },
-            { width: 220, height: 160 },
-            { width: 190, height: 190 },
-            { width: 210, height: 170 }
-        ];
+        // Use natural image dimensions
+        const imageSizes = null;  // Set to null to use natural sizes
+            ];
         
         // Rotation range (in degrees)
         const minRotation = -8;
@@ -445,9 +441,9 @@
                 card.className = 'photo-card';
                 
                 // Random size from preset options
-                const size = imageSizes[index % imageSizes.length];
+                const size = { width: 200, height: 200 };
                 
-                // Random position (with some overlap allowed)
+            
                // Manual positions for each photo (x = left-to-right, y = top-to-bottom)
                 const positions = [
                     { x: 50, y: 20 },     // Photo 1: top-left area
@@ -477,13 +473,33 @@
                 const inner = document.createElement('div');
                 inner.className = 'photo-inner';
                 
-                // Front face (gallery image)
+              // Front face (gallery image)
                 const front = document.createElement('div');
                 front.className = 'photo-front';
                 const frontImg = document.createElement('img');
                 frontImg.src = imgSrc;
                 frontImg.alt = `Gallery photo ${index + 1}`;
                 frontImg.loading = 'lazy';
+                
+                // Set card size to match natural image dimensions
+                frontImg.onload = function() {
+                    const maxWidth = 300;  // Maximum width for any photo
+                    const aspectRatio = this.naturalHeight / this.naturalWidth;
+                    
+                    let width = this.naturalWidth;
+                    let height = this.naturalHeight;
+                    
+                    // Scale down if too large
+                    if (width > maxWidth) {
+                        width = maxWidth;
+                        height = width * aspectRatio;
+                    }
+                    
+                    // Update card dimensions
+                    card.style.width = width + 'px';
+                    card.style.height = height + 'px';
+                };
+                
                 front.appendChild(frontImg);
                 
                 // Back face (seal image)
