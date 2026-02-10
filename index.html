@@ -293,12 +293,13 @@
     
     <!-- Background Music -->
     <!-- 
-        TO CHANGE MUSIC:
-        Replace the src with your music file name
-        Make sure the file is in the same folder as this HTML file
+        TO USE YOUR OWN MUSIC:
+        1. Upload your Fingerbib.mp3 file to GitHub
+        2. Change the src below from the URL to: src="Fingerbib.mp3"
     -->
     <audio id="bgMusic" loop>
-        <source src="Fingerbib.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
     </audio>
     
     <script>
@@ -309,29 +310,31 @@
            ============================================ */
         
         // GALLERY IMAGES (front of cards)
-        // Make sure these files are in the same folder as this HTML file
+        // TO USE YOUR OWN PHOTOS: Replace these URLs with your filenames
+        // Example: Change 'https://...' to 'pic1.jpg' after uploading your photos
         const galleryImages = [
-            'pic1.jpg',
-            'pic2.jpg',
-            'pic3.jpg',
-            'pic4.jpg',
-            'pic5.jpg',
-            'pic6.jpg',
-            'pic7.jpg',
-            'pic8.jpg'
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400',
+            'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400',
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400',
+            'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400',
+            'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400',
+            'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400'
         ];
         
         // SEAL IMAGES (back of cards)
-        // Make sure these files are in the same folder as this HTML file
+        // TO USE YOUR OWN SEAL PHOTOS: Replace these URLs with your filenames
+        // Example: Change 'https://...' to 'seal1.jpg' after uploading your seal photos
         const sealImages = [
-            'seal1.jpg',
-            'seal2.jpg',
-            'seal3.jpg',
-            'seal4.jpg',
-            'seal5.jpg',
-            'seal6.jpg',
-            'seal7.jpg',
-            'seal8.jpg'
+            'https://images.unsplash.com/photo-1583281843449-e5b0c6c4f25c?w=400',
+            'https://images.unsplash.com/photo-1564054830817-30b9c3c07321?w=400',
+            'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=400',
+            'https://images.unsplash.com/photo-1551410224-699683e15636?w=400',
+            'https://images.unsplash.com/photo-1548699853-69a3b23d8bce?w=400',
+            'https://images.unsplash.com/photo-1583281843449-e5b0c6c4f25c?w=400',
+            'https://images.unsplash.com/photo-1564054830817-30b9c3c07321?w=400',
+            'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=400'
         ];
         
         /* ============================================
@@ -348,16 +351,9 @@
         
         // Center clustering configuration
         // These control how tightly photos cluster in the center
-        const positions = [
-            { x: 50, y: 50 },     // Left column, row 1
-            { x: 350, y: 50 },    // Right column, row 1
-            { x: 50, y: 250 },    // Left column, row 2
-            { x: 350, y: 250 },   // Right column, row 2
-            { x: 50, y: 450 },    // Left column, row 3
-            { x: 350, y: 450 },   // Right column, row 3
-            { x: 50, y: 650 },    // Left column, row 4
-            { x: 350, y: 650 }    // Right column, row 4
-        ];
+        const centerX = 200; // Center point X (adjust based on your screen)
+        const centerY = 400; // Center point Y (adjust based on your screen)
+        const spreadRadius = 150; // How far from center photos can appear
         
         /* ============================================
            DOM ELEMENTS
@@ -438,9 +434,6 @@
             const galleryWidth = Math.min(window.innerWidth - 40, 800);
             const galleryHeight = window.innerHeight * 0.8;
             
-            // Track positions to minimize overlapping
-            const usedPositions = [];
-            
             galleryImages.forEach((imgSrc, index) => {
                 // Create card container
                 const card = document.createElement('div');
@@ -450,5 +443,137 @@
                 card.style.width = '250px';
                 card.style.height = '250px';
                 
-                // Position in center with limited overlap
-                l
+                // ============================================
+                // MANUAL PHOTO POSITIONS (Two Column Layout)
+                // Change x and y values to move photos around
+                // x = distance from left edge
+                // y = distance from top edge
+                // ============================================
+                const positions = [
+                    { x: 50, y: 50 },     // Photo 1: Left column, row 1
+                    { x: 350, y: 50 },    // Photo 2: Right column, row 1
+                    { x: 50, y: 250 },    // Photo 3: Left column, row 2
+                    { x: 350, y: 250 },   // Photo 4: Right column, row 2
+                    { x: 50, y: 450 },    // Photo 5: Left column, row 3
+                    { x: 350, y: 450 },   // Photo 6: Right column, row 3
+                    { x: 50, y: 650 },    // Photo 7: Left column, row 4
+                    { x: 350, y: 650 }    // Photo 8: Right column, row 4
+                ];
+                
+                const x = positions[index].x;
+                const y = positions[index].y;
+                
+                // Random rotation
+                const rotation = minRotation + Math.random() * (maxRotation - minRotation);
+                
+                // Apply position styles
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.transform = `rotate(${rotation}deg)`;
+                
+                // Create inner flip container
+                const inner = document.createElement('div');
+                inner.className = 'photo-inner';
+                
+                // Front face (gallery image)
+                const front = document.createElement('div');
+                front.className = 'photo-front';
+                const frontImg = document.createElement('img');
+                frontImg.src = imgSrc;
+                frontImg.alt = `Gallery photo ${index + 1}`;
+                frontImg.loading = 'lazy';
+                
+                // When image loads, resize card to match image dimensions
+                frontImg.onload = function() {
+                    let width = this.naturalWidth;
+                    let height = this.naturalHeight;
+                    
+                    // Scale down if larger than max dimensions
+                    if (width > maxPhotoWidth || height > maxPhotoHeight) {
+                        const widthRatio = maxPhotoWidth / width;
+                        const heightRatio = maxPhotoHeight / height;
+                        const ratio = Math.min(widthRatio, heightRatio);
+                        
+                        width = width * ratio;
+                        height = height * ratio;
+                    }
+                    
+                    // Add padding for the white border (12px on each side = 24px total)
+                    const cardWidth = width + 24;
+                    const cardHeight = height + 24;
+                    
+                    // Update card dimensions
+                    card.style.width = cardWidth + 'px';
+                    card.style.height = cardHeight + 'px';
+                };
+                
+                front.appendChild(frontImg);
+                
+                // Back face (seal image)
+                const back = document.createElement('div');
+                back.className = 'photo-back';
+                const backImg = document.createElement('img');
+                backImg.src = sealImages[index % sealImages.length];
+                backImg.alt = `Seal photo ${index + 1}`;
+                backImg.loading = 'lazy';
+                back.appendChild(backImg);
+                
+                // Assemble card
+                inner.appendChild(front);
+                inner.appendChild(back);
+                card.appendChild(inner);
+                gallery.appendChild(card);
+            });
+            
+            // Show gallery after creation
+            gallery.classList.remove('loading');
+            gallery.classList.add('loaded');
+        }
+        
+        /* ============================================
+           FLIP FUNCTIONALITY
+           Toggles all cards with staggered animation
+           ============================================ */
+        let isFlipped = false;
+        
+        flipButton.addEventListener('click', () => {
+            playOnInteraction(); // Attempt to play music on first tap
+            
+            const cards = document.querySelectorAll('.photo-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    if (isFlipped) {
+                        card.classList.remove('flipped');
+                    } else {
+                        card.classList.add('flipped');
+                    }
+                }, index * 100); // Stagger by 100ms per card
+            });
+            
+            isFlipped = !isFlipped;
+            
+            // Animate button
+            flipButton.style.transform = 'translateY(-50%) rotate(360deg)';
+            setTimeout(() => {
+                flipButton.style.transform = 'translateY(-50%) rotate(0deg)';
+            }, 600);
+        });
+        
+        /* ============================================
+           ENABLE MUSIC ON ANY TAP (mobile fallback)
+           ============================================ */
+        document.body.addEventListener('click', playOnInteraction, { once: false });
+        document.body.addEventListener('touchstart', playOnInteraction, { once: false });
+        
+        /* ============================================
+           INITIALIZATION
+           ============================================ */
+        window.addEventListener('load', () => {
+            createGallery();
+            attemptAutoplay();
+        });
+        
+    </script>
+</body>
+</html>
