@@ -311,6 +311,10 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+
+            .music-control:hover {
+            transform: scale(1.05);
+        }
             
             /* If no image exists, will show emoji */
             font-size: 20px;
@@ -323,15 +327,11 @@
             
             transition: all 0.3s ease;
         }
-        
-        .music-control:hover {
-            transform: scale(1.05);
-        }
+    
         
         /* When music is muted - Upload MusicOff.png for custom muted icon */
         .music-control.muted {
             background-image: url('MusicOff.png');
-            opacity: 0.7;
         }
         
         /* ============================================
@@ -381,10 +381,12 @@
     
     <!-- Flip Button -->
     <button class="Seals" id="flipButton" aria-label="Flip photos">
+        🔄
     </button>
     
     <!-- Music Control -->
     <button class="music-control" id="musicControl" aria-label="Toggle music">
+        🔊
     </button>
     
     <!-- Background Music -->
@@ -657,13 +659,10 @@
             
             // Animate button
             flipButton.style.transform = 'translateY(-50%) rotate(360deg)';
- !!!           /*setTimeout(() => {
+            setTimeout(() => {
                 flipButton.style.transform = 'translateY(-50%) rotate(0deg)';
-            }, 600);*/
+            }, 600);
         });
-
-         .flipButton:hover {
-            transform: scale(1.05);
         
         /* ============================================
            ENABLE MUSIC ON ANY TAP (mobile fallback)
