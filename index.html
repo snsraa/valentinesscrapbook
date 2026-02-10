@@ -494,10 +494,10 @@
         function updateMusicIcon() {
             if (musicPlaying) {
                 musicControl.classList.remove('muted');
-                musicControl.textContent = '🔊';
+                musicControl.textContent = url('MusicOn.png');
             } else {
                 musicControl.classList.add('muted');
-                musicControl.textContent = '🔇';
+                musicControl.textContent = url('MusicOff.png');
             }
         }
         
