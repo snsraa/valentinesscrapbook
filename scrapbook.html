@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Digital Scrapbook</title>
+    <style>
+        /* ============================================
+           CSS VARIABLES - Easy customization
+           ============================================ */
+        :root {
+            /* Colors */
+            --bg-color: #f9f6f0;
+            --page-tint: #fefdfb;
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --tape-color: rgba(255, 255, 255, 0.6);
+            --button-color: #d4a574;
+            --button-hover: #c49563;
+            
+            /* Shadows & effects */
+            --shadow-soft: 0 4px 12px var(--shadow-color);
+            --shadow-lifted: 0 8px 24px rgba(0, 0, 0, 0.2);
+            
+            /* Animation timing */
+            --flip-duration: 0.8s;
+            --stagger-delay: 0.1s;
+        }
+        
+        /* ============================================
+           BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', 'Garamond', serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--page-tint) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Subtle paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px);
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        /* ============================================
+           GALLERY CONTAINER
+           ============================================ */
+        .gallery {
+            max-width: 800px;
+            margin: 60px auto 80px;
+            position: relative;
+            z-index: 2;
+            min-height: 80vh;
+        }
+        
+        /* ============================================
+           PHOTO CARD STYLES
+           Each card has a 3D flip container
+           ============================================ */
+        .photo-card {
+            position: absolute;
+            perspective: 1000px;
+            /* Individual cards are positioned via inline styles in JS */
+        }
+        
+        .photo-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--flip-duration) ease-in-out;
+            transform-style: preserve-3d;
+        }
+        
+        /* When flipped class is added */
+        .photo-card.flipped .photo-inner {
+            transform: rotateY(180deg);
+        }
+        
+        /* Front and back faces */
+        .photo-front,
+        .photo-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 3px;
+        }
+        
+        /* FRONT FACE - Gallery images */
+        .photo-front {
+            background: white;
+            padding: 12px;
+            box-shadow: var(--shadow-soft);
+            transform: rotateY(0deg);
+        }
+        
+        .photo-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 2px;
+        }
+        
+        /* BACK FACE - Seal images */
+        .photo-back {
+            background: white;
+            padding: 12px;
+            box-shadow: var(--shadow-soft);
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .photo-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+        
+        /* Polaroid-style caption area (optional) */
+        .photo-front::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            height: 40px;
+            background: white;
+            border-radius: 0 0 2px 2px;
+        }
+        
+        /* Tape effect using pseudo-elements */
+        .photo-card::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 25px;
+            background: var(--tape-color);
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.1);
+            z-index: 10;
+            border-radius: 2px;
+        }
+        
+        /* Vary tape positions per card - set via nth-child */
+        .photo-card:nth-child(odd)::before {
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+        }
+        
+        .photo-card:nth-child(even)::before {
+            top: -8px;
+            right: 20px;
+            transform: rotate(5deg);
+        }
+        
+        .photo-card:nth-child(3n)::before {
+            top: -8px;
+            left: 20px;
+            transform: rotate(-5deg);
+        }
+        
+        /* ============================================
+           FLIP BUTTON
+           ============================================ */
+        .flip-button {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            
+            background: var(--button-color);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: var(--shadow-lifted);
+            cursor: pointer;
+            
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            transition: all 0.3s ease;
+        }
+        
+        .flip-button:hover {
+            background: var(--button-hover);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .flip-button:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        /* ============================================
+           MUSIC CONTROLS
+           ============================================ */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            
+            background: var(--button-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            background: var(--button-hover);
+            transform: scale(1.05);
+        }
+        
+        /* ============================================
+           RESPONSIVE ADJUSTMENTS
+           ============================================ */
+        @media (max-width: 600px) {
+            .gallery {
+                margin: 40px auto 60px;
+            }
+            
+            .flip-button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                right: 15px;
+            }
+            
+            .music-control {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+        
+        /* ============================================
+           LOADING STATE (optional)
+           ============================================ */
+        .gallery.loading {
+            opacity: 0;
+        }
+        
+        .gallery.loaded {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Gallery Container -->
+    <div class="gallery loading" id="gallery"></div>
+    
+    <!-- Flip Button -->
+    <button class="flip-button" id="flipButton" aria-label="Flip photos">
+        🔄
+    </button>
+    
+    <!-- Music Control -->
+    <button class="music-control" id="musicControl" aria-label="Toggle music">
+        🔊
+    </button>
+    
+    <!-- Background Music -->
+    <!-- 
+        TO CHANGE MUSIC:
+        Replace the src URL below with your music file
+        Supported formats: MP3, OGG, WAV
+        For best compatibility, use MP3
+    -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script>
+        /* ============================================
+           IMAGE CONFIGURATION
+           TO CHANGE IMAGES: Edit the arrays below
+           ============================================ */
+        
+        // GALLERY IMAGES (front of cards)
+        // Replace these URLs with your own images
+        const galleryImages = [
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400',
+            'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400',
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400',
+            'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400',
+            'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400',
+            'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400'
+        ];
+        
+        // SEAL IMAGES (back of cards)
+        // Replace these URLs with your seal photos
+        const sealImages = [
+            'https://images.unsplash.com/photo-1583281843449-e5b0c6c4f25c?w=400',
+            'https://images.unsplash.com/photo-1564054830817-30b9c3c07321?w=400',
+            'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=400',
+            'https://images.unsplash.com/photo-1551410224-699683e15636?w=400',
+            'https://images.unsplash.com/photo-1548699853-69a3b23d8bce?w=400',
+            'https://images.unsplash.com/photo-1583281843449-e5b0c6c4f25c?w=400',
+            'https://images.unsplash.com/photo-1564054830817-30b9c3c07321?w=400',
+            'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=400'
+        ];
+        
+        /* ============================================
+           SCRAPBOOK LAYOUT CONFIGURATION
+           Adjust these to change randomness
+           ============================================ */
+        
+        // Size variations (in pixels)
+        const imageSizes = [
+            { width: 200, height: 180 },
+            { width: 180, height: 200 },
+            { width: 220, height: 160 },
+            { width: 190, height: 190 },
+            { width: 210, height: 170 }
+        ];
+        
+        // Rotation range (in degrees)
+        const minRotation = -8;
+        const maxRotation = 8;
+        
+        /* ============================================
+           DOM ELEMENTS
+           ============================================ */
+        const gallery = document.getElementById('gallery');
+        const flipButton = document.getElementById('flipButton');
+        const musicControl = document.getElementById('musicControl');
+        const bgMusic = document.getElementById('bgMusic');
+        
+        /* ============================================
+           MUSIC AUTOPLAY HANDLING
+           Mobile Safari/Chrome often blocks autoplay
+           This attempts autoplay, then falls back to
+           playing on first user interaction
+           ============================================ */
+        let musicPlaying = false;
+        let userInteracted = false;
+        
+        // Attempt to play music on page load
+        function attemptAutoplay() {
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        // Autoplay successful
+                        musicPlaying = true;
+                        updateMusicIcon();
+                    })
+                    .catch(error => {
+                        // Autoplay blocked - will play on first interaction
+                        console.log('Autoplay blocked, waiting for user interaction');
+                        musicPlaying = false;
+                        updateMusicIcon();
+                    });
+            }
+        }
+        
+        // Play music on first user interaction
+        function playOnInteraction() {
+            if (!userInteracted && !musicPlaying) {
+                bgMusic.play()
+                    .then(() => {
+                        musicPlaying = true;
+                        updateMusicIcon();
+                    })
+                    .catch(err => console.log('Could not play audio:', err));
+                userInteracted = true;
+            }
+        }
+        
+        // Update music icon
+        function updateMusicIcon() {
+            musicControl.textContent = musicPlaying ? '🔊' : '🔇';
+        }
+        
+        // Toggle music on/off
+        musicControl.addEventListener('click', () => {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicPlaying = false;
+            } else {
+                bgMusic.play()
+                    .then(() => {
+                        musicPlaying = true;
+                    })
+                    .catch(err => console.log('Could not play audio:', err));
+            }
+            updateMusicIcon();
+        });
+        
+        /* ============================================
+           GALLERY GENERATION
+           Creates photo cards with asymmetric layout
+           ============================================ */
+        function createGallery() {
+            const galleryWidth = Math.min(window.innerWidth - 40, 800);
+            const galleryHeight = window.innerHeight * 0.8;
+            
+            galleryImages.forEach((imgSrc, index) => {
+                // Create card container
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                
+                // Random size from preset options
+                const size = imageSizes[index % imageSizes.length];
+                
+                // Random position (with some overlap allowed)
+                const maxX = galleryWidth - size.width;
+                const maxY = galleryHeight - size.height;
+                const x = Math.random() * Math.max(0, maxX);
+                const y = (index * 120) + (Math.random() * 80 - 40); // Staggered vertical
+                
+                // Random rotation
+                const rotation = minRotation + Math.random() * (maxRotation - minRotation);
+                
+                // Apply styles
+                card.style.width = size.width + 'px';
+                card.style.height = size.height + 'px';
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.transform = `rotate(${rotation}deg)`;
+                
+                // Create inner flip container
+                const inner = document.createElement('div');
+                inner.className = 'photo-inner';
+                
+                // Front face (gallery image)
+                const front = document.createElement('div');
+                front.className = 'photo-front';
+                const frontImg = document.createElement('img');
+                frontImg.src = imgSrc;
+                frontImg.alt = `Gallery photo ${index + 1}`;
+                frontImg.loading = 'lazy';
+                front.appendChild(frontImg);
+                
+                // Back face (seal image)
+                const back = document.createElement('div');
+                back.className = 'photo-back';
+                const backImg = document.createElement('img');
+                backImg.src = sealImages[index % sealImages.length];
+                backImg.alt = `Seal photo ${index + 1}`;
+                backImg.loading = 'lazy';
+                back.appendChild(backImg);
+                
+                // Assemble card
+                inner.appendChild(front);
+                inner.appendChild(back);
+                card.appendChild(inner);
+                gallery.appendChild(card);
+            });
+            
+            // Show gallery after creation
+            gallery.classList.remove('loading');
+            gallery.classList.add('loaded');
+        }
+        
+        /* ============================================
+           FLIP FUNCTIONALITY
+           Toggles all cards with staggered animation
+           ============================================ */
+        let isFlipped = false;
+        
+        flipButton.addEventListener('click', () => {
+            playOnInteraction(); // Attempt to play music on first tap
+            
+            const cards = document.querySelectorAll('.photo-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    if (isFlipped) {
+                        card.classList.remove('flipped');
+                    } else {
+                        card.classList.add('flipped');
+                    }
+                }, index * 100); // Stagger by 100ms per card
+            });
+            
+            isFlipped = !isFlipped;
+            
+            // Animate button
+            flipButton.style.transform = 'translateY(-50%) rotate(360deg)';
+            setTimeout(() => {
+                flipButton.style.transform = 'translateY(-50%) rotate(0deg)';
+            }, 600);
+        });
+        
+        /* ============================================
+           ENABLE MUSIC ON ANY TAP (mobile fallback)
+           ============================================ */
+        document.body.addEventListener('click', playOnInteraction, { once: false });
+        document.body.addEventListener('touchstart', playOnInteraction, { once: false });
+        
+        /* ============================================
+           INITIALIZATION
+           ============================================ */
+        window.addEventListener('load', () => {
+            createGallery();
+            attemptAutoplay();
+        });
+        
+    </script>
+</body>
+</html>
