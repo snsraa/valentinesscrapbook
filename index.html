@@ -449,10 +449,20 @@
                 const size = imageSizes[index % imageSizes.length];
                 
                 // Random position (with some overlap allowed)
-                const maxX = galleryWidth - size.width;
-                const maxY = galleryHeight - size.height;
-                const x = Math.random() * Math.max(0, maxX);
-                const y = (index * 120) + (Math.random() * 80 - 40); // Staggered vertical
+               // Manual positions for each photo (x = left-to-right, y = top-to-bottom)
+                const positions = [
+                    { x: 50, y: 20 },     // Photo 1: top-left area
+                    { x: 280, y: 100 },   // Photo 2: top-right area  
+                    { x: 120, y: 220 },   // Photo 3: middle-left
+                    { x: 350, y: 280 },   // Photo 4: middle-right
+                    { x: 80, y: 420 },    // Photo 5: lower-left
+                    { x: 300, y: 480 },   // Photo 6: lower-right
+                    { x: 180, y: 620 },   // Photo 7: bottom-left
+                    { x: 360, y: 680 }    // Photo 8: bottom-right
+                ];
+
+                    const x = positions[index].x;
+                    const y = positions[index].y;
                 
                 // Random rotation
                 const rotation = minRotation + Math.random() * (maxRotation - minRotation);
