@@ -81,14 +81,13 @@
             /* Individual cards are positioned via inline styles in JS */
         }
         
-       .photo-inner {
+        .photo-inner {
             position: relative;
             width: 100%;
             height: 100%;
             transition: transform var(--flip-duration) ease-in-out;
             transform-style: preserve-3d;
         }
-        
         
         /* Front and back faces */
         .photo-front,
@@ -169,7 +168,84 @@
         }
         
         /* ============================================
-           FLIP BUTTON
+           FLOATING HEARTS ANIMATION
+           ============================================ */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            bottom: -100px;
+            width: 50px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.6;
+            animation: floatUp linear infinite;
+            pointer-events: none;
+        }
+
+        /* Different heart images - TO USE YOUR OWN: Upload heart1.png, heart2.png, heart3.png */
+        .heart.heart1 {
+            background-image: url('heart1.png');
+        }
+
+        .heart.heart2 {
+            background-image: url('heart2.png');
+        }
+
+        .heart.heart3 {
+            background-image: url('heart3.png');
+        }
+
+        /* Floating animation */
+        @keyframes floatUp {
+            0% {
+                bottom: -100px;
+                transform: translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                bottom: 110vh;
+                transform: translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Different sizes */
+        .heart.small {
+            width: 40px;
+            height: 40px;
+        }
+
+        .heart.medium {
+            width: 50px;
+            height: 50px;
+        }
+
+        .heart.large {
+            width: 70px;
+            height: 70px;
+        }
+        
+        /* ============================================
+           FLIP BUTTON - WITH CUSTOM IMAGE SUPPORT
+           TO USE YOUR OWN: Upload flip-button.png
            ============================================ */
         .flip-button {
             position: fixed;
@@ -178,25 +254,33 @@
             transform: translateY(-50%);
             z-index: 100;
             
+            /* Default background (shown if no custom image) */
             background: var(--button-color);
             color: white;
             border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            box-shadow: var(--shadow-lifted);
+            width: 70px;
+            height: 70px;
             cursor: pointer;
             
+            /* Custom button image - Upload flip-button.png to use */
+            background-image: url('flip-button.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            
+            /* If no image exists, will show emoji */
             font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             
+            /* Optional: shadow for depth */
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            
             transition: all 0.3s ease;
         }
         
         .flip-button:hover {
-            background: var(--button-hover);
             transform: translateY(-50%) scale(1.1);
         }
         
@@ -205,7 +289,8 @@
         }
         
         /* ============================================
-           MUSIC CONTROLS
+           MUSIC CONTROLS - WITH CUSTOM IMAGE SUPPORT
+           TO USE YOUR OWN: Upload music-button.png and music-button-muted.png
            ============================================ */
         .music-control {
             position: fixed;
@@ -213,26 +298,40 @@
             right: 20px;
             z-index: 100;
             
+            /* Default background (shown if no custom image) */
             background: var(--button-color);
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            box-shadow: var(--shadow-soft);
+            width: 60px;
+            height: 60px;
             cursor: pointer;
             
+            /* Custom music button image - Upload music-button.png to use */
+            background-image: url('music-button.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            
+            /* If no image exists, will show emoji */
             font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             
+            /* Optional: shadow for depth */
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+            
             transition: all 0.3s ease;
         }
         
         .music-control:hover {
-            background: var(--button-hover);
             transform: scale(1.05);
+        }
+        
+        /* When music is muted - Upload music-button-muted.png for custom muted icon */
+        .music-control.muted {
+            background-image: url('music-button-muted.png');
+            opacity: 0.7;
         }
         
         /* ============================================
@@ -244,15 +343,15 @@
             }
             
             .flip-button {
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: 60px;
                 font-size: 20px;
                 right: 15px;
             }
             
             .music-control {
-                width: 45px;
-                height: 45px;
+                width: 50px;
+                height: 50px;
                 font-size: 18px;
                 bottom: 15px;
                 right: 15px;
@@ -274,6 +373,9 @@
 </head>
 <body>
     
+    <!-- Floating Hearts Background -->
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
     <!-- Gallery Container -->
     <div class="gallery loading" id="gallery"></div>
     
@@ -289,7 +391,7 @@
     
     <!-- Background Music -->
     <audio id="bgMusic" loop>
-        <source src=src="Fingerbib.mp3" type="audio/mpeg">
+        <source src="Fingerbib.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
     
@@ -301,8 +403,7 @@
            ============================================ */
         
         // GALLERY IMAGES (front of cards)
-        // TO USE YOUR OWN PHOTOS: Replace these URLs with your filenames
-        // Example: Change 'https://...' to 'pic1.jpg' after uploading your photos
+        // Make sure these files are in the same folder as this HTML file
         const galleryImages = [
             'pic1.jpg',
             'pic2.jpg',
@@ -315,8 +416,7 @@
         ];
         
         // SEAL IMAGES (back of cards)
-        // TO USE YOUR OWN SEAL PHOTOS: Replace these URLs with your filenames
-        // Example: Change 'https://...' to 'seal1.jpg' after uploading your seal photos
+        // Make sure these files are in the same folder as this HTML file
         const sealImages = [
             'seal1.jpg',
             'seal2.jpg',
@@ -339,12 +439,6 @@
         // Rotation range (in degrees) - set to 0 for no rotation
         const minRotation = -8;
         const maxRotation = 8;
-        
-        // Center clustering configuration
-        // These control how tightly photos cluster in the center
-        const centerX = 200; // Center point X (adjust based on your screen)
-        const centerY = 400; // Center point Y (adjust based on your screen)
-        const spreadRadius = 150; // How far from center photos can appear
         
         /* ============================================
            DOM ELEMENTS
@@ -396,9 +490,15 @@
             }
         }
         
-        // Update music icon
+        // Update music icon by toggling CSS class
         function updateMusicIcon() {
-            musicControl.textContent = musicPlaying ? '🔊' : '🔇';
+            if (musicPlaying) {
+                musicControl.classList.remove('muted');
+                musicControl.textContent = '🔊';
+            } else {
+                musicControl.classList.add('muted');
+                musicControl.textContent = '🔇';
+            }
         }
         
         // Toggle music on/off
@@ -418,7 +518,7 @@
         
         /* ============================================
            GALLERY GENERATION
-           Creates photo cards with centered clustering
+           Creates photo cards with manual positioning
            Photos display at their natural size (limited by max dimensions)
            ============================================ */
         function createGallery() {
@@ -435,7 +535,7 @@
                 card.style.height = '250px';
                 
                 // ============================================
-                // MANUAL PHOTO POSITIONS (Two Column Layout)
+                // MANUAL PHOTO POSITIONS
                 // Change x and y values to move photos around
                 // x = distance from left edge
                 // y = distance from top edge
@@ -571,11 +671,56 @@
         document.body.addEventListener('touchstart', playOnInteraction, { once: false });
         
         /* ============================================
+           FLOATING HEARTS GENERATOR
+           Creates hearts that float up continuously
+           ============================================ */
+        function createFloatingHearts() {
+            const heartsContainer = document.getElementById('floatingHearts');
+            
+            // Create a new heart every 2 seconds
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                // Random heart image (heart1, heart2, or heart3)
+                const heartTypes = ['heart1', 'heart2', 'heart3'];
+                const randomType = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                heart.classList.add(randomType);
+                
+                // Random size
+                const sizes = ['small', 'medium', 'large'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                heart.classList.add(randomSize);
+                
+                // Random horizontal position
+                const randomLeft = Math.random() * 100;
+                heart.style.left = randomLeft + '%';
+                
+                // Random animation duration (10-20 seconds)
+                const randomDuration = 10 + Math.random() * 10;
+                heart.style.animationDuration = randomDuration + 's';
+                
+                // Random delay
+                const randomDelay = Math.random() * 2;
+                heart.style.animationDelay = randomDelay + 's';
+                
+                // Add to container
+                heartsContainer.appendChild(heart);
+                
+                // Remove heart after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, (randomDuration + randomDelay) * 1000);
+            }, 2000); // Create new heart every 2 seconds
+        }
+        
+        /* ============================================
            INITIALIZATION
            ============================================ */
         window.addEventListener('load', () => {
             createGallery();
             attemptAutoplay();
+            createFloatingHearts(); // Start floating hearts
         });
         
     </script>
